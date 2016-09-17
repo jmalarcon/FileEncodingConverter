@@ -1,6 +1,11 @@
 # FileEncodingConverter
 Convierte todos los archivos de una carpeta y sus subcarpetas a una codificación determinada.
 
+### v1.5.0 - Sept2016
+
+- Añadida opción para generar UTF-8 con o sin BOM.
+- OJO: ahora la codificación "UTF8" se refiere especificamente a **UTF-8 sin BOM**. Si la quieres con BOM debes utilizar "UTF8BOM" como codificación de destino.
+
 ## Introducción
 Hace unos años creé una aplicación, pequeña pero muy útil, llamada **FileEncoding Converter**, cuyo código tienes en este repositorio.
 
@@ -21,6 +26,7 @@ Los tipos de codificación soportados son los siguientes:
 - UTF32
 - UTF7
 - UTF8
+- UTF8BOM (le añade [el BOM](https://es.wikipedia.org/wiki/Marca_de_orden_de_bytes) a la codificación UTF-8).
 
 Este parámetro no distingue entre mayúsculas y minúsculas, por lo que podemos poner cualquiera de estos valores como queramos. Si omitimos este parámetro o usamos un valor no soportado la codificación que se usará por defecto será ANSI (la que tiene por defecto el sistema).
 
@@ -41,7 +47,7 @@ Son los siguientes:
 Sirve para forzar la conversión siempre. Esto es muy útil cuando, por ejemplo, tienes archivos en formato UTF8 sin BOM. Si los conviertes también a UTF8, al detectar que ya están en UTF8 no los codifica. Forzando la conversión los grabará de nuevo como UTF8 pero esta vez poniéndoles el BOM, lo cual puede ser muy útil.
 
 #### "/b" o "-b": MODO BATCH
-la utilidad, por defecto, se detienen en al terminar el procesamiento esperando a que el usuario pulse alguna tecla. De este modo podemos ver qué archivos se han procesado y no se nos cierra la consola en caso de que lo hayamos ejecutado fuera de ésta. Si especificamos "/b" o "-b" forzaremos el modo "batch", en el que el programa no se detiene al final. Es útil para usar el programa en un proceso de tipo ".bat" en el que se ejecutan muchos otros comandos y así no se detiene la ejecución.
+El programa, por defecto, se detiene al terminar el procesamiento de los archivos esperando a que el usuario pulse alguna tecla. De este modo podemos ver qué archivos se han procesado y no se nos cierra la consola en caso de que lo hayamos ejecutado fuera de ésta. Si especificamos "/b" o "-b" forzaremos el modo "batch", en el que el programa no se detiene al final. Es útil para usar el programa en un proceso de tipo ".bat" en el que se ejecutan muchos otros comandos y así no se detiene la ejecución.
 
 #### Ayuda
 Para ver una ayuda rápida sobre su uso basta con poner /? o -? o ejecutarlo sin parámetro alguno.
@@ -50,7 +56,7 @@ Para ver una ayuda rápida sobre su uso basta con poner /? o -? o ejecutarlo sin
 
 Este es un dato importante...
 
-Los archivos codificados según alguno de los tipos anteriores generalmente llevan delante una marca de tres bytes llamada **preámbulo o BOM** (Byte Order Mark). Aunque no es obligatorio sí es muy útil puesto que nos indica de modo inequívoco de qué forma está codificado un archivo. Cuando se usa en un entorno cerrado (donde ya conocemos cuál es la codificación que se usa siempre) no hace falta, pero en el intercambio de archivos en mi opinión debería usarse siempre.
+Los archivos codificados según alguno de los tipos anteriores generalmente llevan delante una marca de tres bytes llamada **[preámbulo o BOM (Byte Order Mark)](https://es.wikipedia.org/wiki/Marca_de_orden_de_bytes)**. Aunque no es obligatorio sí es muy útil puesto que nos indica de modo inequívoco de qué forma está codificado un archivo. Cuando se usa en un entorno cerrado (donde ya conocemos cuál es la codificación que se usa siempre) no hace falta, pero en el intercambio de archivos en mi opinión debería usarse siempre.
 
 La cuestión es que en Windows muchos editores de texto le ponen el BOM a los archivos. Pero en Mac y Linux es al contrario y no se lo suelen poner. Por regla general si no llevan el BOM están codificados en ANSI o en UTF8. Lo malo es que la única forma de saberlo si no llevan el BOM es **utilizando un método heurístico** que consiste en tratar de identificar ciertas secuencias de bytes dentro del archivo, que te indicarán la presencia de la codificación con un alto grado de probabilidad.
 
@@ -76,14 +82,21 @@ o para convertir todos a ANSI valdría con poner simplemente (con todas las opci
 FileEncodingConverter C:\Micarpeta
 ```
 
-Para forzar la conversión (o re-conversión) a UTF8 de todos los archivos XML cuyo nombre contenga las letras 'ES', además de todos los de texto así como los HTM (tanto .htm como .html), podrías escribir:
+Para forzar la conversión (o re-conversión) a UTF-8 de todos los archivos XML cuyo nombre contenga las letras 'ES', además de todos los de texto así como los HTM (tanto .htm como .html), podrías escribir:
 
 ```
 FileEncodingConverter C:\MisArchivosDedatos UTF8 *ES*.xml,*.txt,*.htm* /f
 ```
 
+o
+
+```
+FileEncodingConverter C:\MisArchivosDedatos UTF8BOM *ES*.xml,*.txt,*.htm* /f
+```
+si queremos que la conversión les incluya el BOM inicial a los archivos como indicador de que son UTF-8.
+
 ## Información adicional
-Este programa está escrito en C# usando la plataforma .NET, y he utilizado Visual Studio.
+Este programa está escrito en C# usando la plataforma .NET, y he utilizado Visual Studio Community Edition.
 
 Se incluye el archivo .sln de Visual Studio para facilitar su edición y compilación.
 

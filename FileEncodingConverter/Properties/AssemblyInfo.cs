@@ -10,7 +10,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("www.jasoft.org")]
 [assembly: AssemblyProduct("FileEncodingConverter")]
-[assembly: AssemblyCopyright("(c) José M. Alarcón 2007-2013")]
+[assembly: AssemblyCopyright("por José M. Alarcón 2007-2016 - Apache License")]
+
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +30,5 @@ using System.Runtime.InteropServices;
 //      Número de versión de compilación
 //      Revisión
 //
-[assembly: AssemblyVersion("1.4.1.0")]
-[assembly: AssemblyFileVersion("1.4.1.0")]
+[assembly: AssemblyVersion("1.5.0.0")]
+[assembly: AssemblyFileVersion("1.5.0.0")]
