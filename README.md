@@ -1,7 +1,7 @@
 # FileEncodingConverter
 Convierte todos los archivos de una carpeta y sus subcarpetas a una codificación determinada.
 
-### v1.5.0 - Sept2016
+### v1.5.0 - Septiembre de 2016
 
 - Añadida opción para generar UTF-8 con o sin BOM.
 - OJO: ahora la codificación "UTF8" se refiere especificamente a **UTF-8 sin BOM**. Si la quieres con BOM debes utilizar "UTF8BOM" como codificación de destino.
@@ -56,13 +56,15 @@ Para ver una ayuda rápida sobre su uso basta con poner /? o -? o ejecutarlo sin
 
 Este es un dato importante...
 
-Los archivos codificados según alguno de los tipos anteriores generalmente llevan delante una marca de tres bytes llamada **[preámbulo o BOM (Byte Order Mark)](https://es.wikipedia.org/wiki/Marca_de_orden_de_bytes)**. Aunque no es obligatorio sí es muy útil puesto que nos indica de modo inequívoco de qué forma está codificado un archivo. Cuando se usa en un entorno cerrado (donde ya conocemos cuál es la codificación que se usa siempre) no hace falta, pero en el intercambio de archivos en mi opinión debería usarse siempre.
+Los archivos codificados según alguno de los tipos anteriores generalmente llevan delante una marca de tres bytes llamada **[preámbulo o BOM (Byte Order Mark)](https://es.wikipedia.org/wiki/Marca_de_orden_de_bytes)**. Aunque no es obligatorio en el caso de UTF-8, sí es muy útil puesto que nos indica de modo inequívoco de qué forma está codificado un archivo. Cuando se usa en un entorno cerrado (donde ya conocemos cuál es la codificación que se usa siempre) no hace falta, pero en el intercambio de archivos **en mi opinión debería usarse siempre**^* 
 
 La cuestión es que en Windows muchos editores de texto le ponen el BOM a los archivos. Pero en Mac y Linux es al contrario y no se lo suelen poner. Por regla general si no llevan el BOM están codificados en ANSI o en UTF8. Lo malo es que la única forma de saberlo si no llevan el BOM es **utilizando un método heurístico** que consiste en tratar de identificar ciertas secuencias de bytes dentro del archivo, que te indicarán la presencia de la codificación con un alto grado de probabilidad.
 
 Esta versión del conversor identifica los archivos UTF8 sin BOM usando este método heurístico, por lo que es capaz de trabajar con la mayoría de archivos que te puedas encontrar por ahí. Es importante saberlo.
 
-A raíz de esta capacidad he incluido también **la opción de forzar la reconversión **que mencionaba antes (/f) para forzar la inclusión del BOM en los archivos UTF8 y facilitar su intercambio.
+A raíz de esta capacidad he incluido también **la opción de forzar la reconversión** que mencionaba antes (/f) para forzar la inclusión del BOM en los archivos UTF-8 (indicando la codificación "UTF8BOM" como codificación final) y facilitar su intercambio si lo necesitamos.
+
+>^* Por ejemplo, el sencillo archivo ANSI.txt de la carpeta `Test` del repositorio de esta aplicación, es un archivo codificado como ANSI y solo tiene caracteres acentuados y eñes. Si intentas abrirlo, muchos editores no son capaces de identificar correctamente la codificación. Notepad++, por ejemplo, lo identifica como texto hebreo y no se ve cómo debiera. Brackets te dice que no es capaz de abrirlo aunque tengas la extensión de codificaciones instalada.... Curiosamente el bloc de notas de Windows lo identifica bien (probablemente porque considera que por defecto los archivos son ANSI), y también Visual Studio. Pero el algoritmo heurístico habitual para detectar UTF-8 (el utilizado en FileEncodingCovnerter) no lo reconoce correctamente y, de hecho, la codificación a UTF-8 falla en el caso concreto de dicho archivo. Es un caso poco frecuente y por regla general no hay problema para reconocer este tipo de archivos, pero por eso mismo opino que el BOM debería utilizarse siempre a pesar de que muchos digan que no es necesario porque se puede detctar con una gran probabilidad en la mayoría de los casos. Ese archivo es un buen contra-ejemplo de ello. Y si con el BOM siempre se detecta bien ¿para qué arriesgarse?.
 
 ## Ejemplos de uso
 

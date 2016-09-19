@@ -133,7 +133,7 @@ namespace FileEncodingConverter
             Console.WriteLine("\nEj: FileEncodingConverter c:\\Misdatos UnicodeBI *.txt,*.xml /f");
             Console.WriteLine("\nEj: FileEncodingConverter c:\\Misdatos UTF8 *.txt,*.xml /nf /b");
             Console.WriteLine("\nLa codificación se refiere a la codificación final a la que deseamos convertir todos los archivos.");
-            Console.WriteLine("\nLos valores válidos son: ANSI, ASCII, Unicode, UnicodeBI (Big Indian), UTF32, UTF7, UTF8. Si se omite se codifica con ANSI, valor por defecto del sistema. Detecta también UTF8 sin BOM.");
+            Console.WriteLine("\nLos valores válidos son: ANSI, ASCII, Unicode, UnicodeBI, UTF32, UTF7, UTF8, UTF8BOM. Si se omite se codifica con ANSI, valor por defecto del sistema. Detecta también UTF8 sin BOM.");
             Console.WriteLine("\nSi no se especifican los tipos de archivo se usarán *.txt y *.htm.");
             Console.WriteLine("\nEl cuarto parámetro, /f, se utiliza para forzar la recodificación de los archivos. Esto hará que, por ejemplo, archivos codificados como UTF8 sin BOM se codifiquen como UTF8 de nuevo pero con BOM, que es lo que hace por defecto. Si no queremos usarlo podemos poner cualquier otro, por ejemplo /nf, para poder usar el siguiente.");
             Console.WriteLine("\nEl quinto parámetro, /b, se utiliza para indicar que estamos ejecutando en un 'batch' y que por lo tanto no debe detenerse la ejecución, permitiendo que sigan ejecutándose otros programas.");
@@ -471,7 +471,7 @@ namespace FileEncodingConverter
         #endregion
 
         /// <summary>
-        /// Indica en texto el nombre del tipo de codificación de un archivo.
+        /// Devuelve el codificador apropiado para la codificación actual del archivo que se le pase.
         /// </summary>
         /// <param name="FileName"></param>
         /// <returns></returns>
