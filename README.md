@@ -1,11 +1,6 @@
 # FileEncodingConverter
 Convierte todos los archivos de una carpeta y sus subcarpetas a una codificación determinada.
 
-### v1.5.0 - Septiembre de 2016
-
-- Añadida opción para generar UTF-8 con o sin BOM.
-- OJO: ahora la codificación "UTF8" se refiere especificamente a **UTF-8 sin BOM**. Si la quieres con BOM debes utilizar "UTF8BOM" como codificación de destino.
-
 ## Introducción
 Hace unos años creé una aplicación, pequeña pero muy útil, llamada **FileEncoding Converter**, cuyo código tienes en este repositorio.
 
@@ -95,6 +90,7 @@ o
 ```
 FileEncodingConverter C:\MisArchivosDedatos UTF8BOM *ES*.xml,*.txt,*.htm* /f
 ```
+
 si queremos que la conversión les incluya el BOM inicial a los archivos como indicador de que son UTF-8.
 
 ## Información adicional
@@ -105,3 +101,5 @@ Se incluye el archivo .sln de Visual Studio para facilitar su edición y compila
 Lo he atado a la versión 2.0 de .NET para que sea mas fácil ejecutarlo en cualquier lugar.
 
 Licencia [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+>Thanks to Microsoft's Peter Smith (https://github.com/pedasmith) for his suggestions about a small bug with detecting UTF-8 encoding without BOM.
