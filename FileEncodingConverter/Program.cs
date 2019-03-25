@@ -215,6 +215,19 @@ namespace FileEncodingConverter
         }
 
         /// <summary>
+        /// Compara correctamente dos codificaciones ya que aparentemente el Equals de la clase Encoding no lo hace bien y siempre da false
+        /// </summary>
+        /// <param name="enc01"></param>
+        /// <param name="enc02"></param>
+        /// <returns></returns>
+        private static bool AreEqual(Encoding enc01, Encoding enc02)
+        {
+            return (enc01.CodePage == enc02.CodePage && 
+                    enc01.EncoderFallback.Equals(enc02.EncoderFallback) && 
+                    enc01.DecoderFallback.Equals(enc02.DecoderFallback));
+        }
+
+        /// <summary>
         /// Convierte el archivo indicado a la codificación indicada si no lo está ya
         /// </summary>
         /// <param name="file"></param>
@@ -225,7 +238,7 @@ namespace FileEncodingConverter
 
             Encoding tipoAct = GetFileEncoding(file);
             //Sólo se codifica si se fuerza o si la codif original es diferente a la final
-            if (forzarRecodificacion || !tipoAct.Equals(tipoDest))
+            if (forzarRecodificacion || !AreEqual(tipoAct, tipoDest))
             {
                 Console.WriteLine("Convirtiendo {0}", file);
 
@@ -271,6 +284,8 @@ namespace FileEncodingConverter
         ////////////////////////////////////////////////////////////////
         //	OPEN SOURCE CODE
         //	Based on the Utf8Checker class found here: http://utf8checker.codeplex.com/
+        //  and later modified by the suggestion of Microsoft's Peter Smith (https://github.com/jmalarcon/FileEncodingConverter/issues/1) 
+        //  and his fix for a bug here: https://github.com/pedasmith/NetworkParser
         ////////////////////////////////////////////////////////////////
         private static bool checkUTFWithoutBOM(string PhysicalPath)
         {
@@ -308,162 +323,59 @@ namespace FileEncodingConverter
         }
 
         /// <summary>
-        /// 
+        /// Returns true if the given buffer is valid UTF8 chars.
+        /// If the buffer is null or has no chars, then return true.
         /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="length"></param>
+        /// <param name="buffer">Array of byte values to evaluate</param>
+        /// <param name="length">Length of buffer; if -1 (the default) then the entire buffer will be checked </param>
         /// <returns></returns>
-        private static bool IsUtf8(byte[] buffer, int length)
+        public static bool IsUtf8(byte[] buffer, int length = -1)
         {
-            int position = 0;
-            int bytes = 0;
+            if (buffer == null) return true; // null buffes are Utf8 (there aren't any invalid bytes)
+            if (length == -1) length = buffer.Length;
+            if (length > buffer.Length) return false;
 
-            while (position < length)
+            for (int i = 0; i < length; i++)
             {
-                if (!IsValid(buffer, position, length, ref bytes))
+                var tailLength = nextra(buffer[i]);
+                if (tailLength < 0) return false;
+                for (int j = 0; j < tailLength; j++)
                 {
-                    return false;
+                    var index = i + j + 1;
+                    if (index >= length)
+                    {
+                        return false;
+                    }
+                    byte b = buffer[index];
+                    if ((b & ~0x3F) != 0x80)
+                    {
+                        return false;
+                    }
                 }
-                position += bytes;
+                i += tailLength;
             }
             return true;
         }
 
-        private static bool IsValid(byte[] buffer, int position, int length, ref int bytes)
+        private static int nextra(byte b)
         {
-            if (length > buffer.Length)
+            if ((b & ~0x7F) == 0)
             {
-                throw new ArgumentException("Invalid length");
+                return 0; // is 7-bit ascii
             }
-
-            if (position > length - 1)
+            else if ((b & ~0x1F) == 0xC0)
             {
-                bytes = 0;
-                return true;
+                return 1; // is 2-byte
             }
-
-            byte ch = buffer[position];
-
-            if (ch <= 0x7F)
+            else if ((b & ~0x0F) == 0xE0)
             {
-                bytes = 1;
-                return true;
+                return 2; // is 3-byte
             }
-
-            if (ch >= 0xc2 && ch <= 0xdf)
+            else if ((b & ~0x07) == 0xF0)
             {
-                if (position >= length - 2)
-                {
-                    bytes = 0;
-                    return false;
-                }
-                if (buffer[position + 1] < 0x80 || buffer[position + 1] > 0xbf)
-                {
-                    bytes = 0;
-                    return false;
-                }
-                bytes = 2;
-                return true;
+                return 3; // is 4-byte
             }
-
-            if (ch == 0xe0)
-            {
-                if (position >= length - 3)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                if (buffer[position + 1] < 0xa0 || buffer[position + 1] > 0xbf ||
-                    buffer[position + 2] < 0x80 || buffer[position + 2] > 0xbf)
-                {
-                    bytes = 0;
-                    return false;
-                }
-                bytes = 3;
-                return true;
-            }
-
-            if (ch >= 0xe1 && ch <= 0xef)
-            {
-                if (position >= length - 3)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                if (buffer[position + 1] < 0x80 || buffer[position + 1] > 0xbf ||
-                    buffer[position + 2] < 0x80 || buffer[position + 2] > 0xbf)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                bytes = 3;
-                return true;
-            }
-
-            if (ch == 0xf0)
-            {
-                if (position >= length - 4)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                if (buffer[position + 1] < 0x90 || buffer[position + 1] > 0xbf ||
-                    buffer[position + 2] < 0x80 || buffer[position + 2] > 0xbf ||
-                    buffer[position + 3] < 0x80 || buffer[position + 3] > 0xbf)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                bytes = 4;
-                return true;
-            }
-
-            if (ch == 0xf4)
-            {
-                if (position >= length - 4)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                if (buffer[position + 1] < 0x80 || buffer[position + 1] > 0x8f ||
-                    buffer[position + 2] < 0x80 || buffer[position + 2] > 0xbf ||
-                    buffer[position + 3] < 0x80 || buffer[position + 3] > 0xbf)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                bytes = 4;
-                return true;
-            }
-
-            if (ch >= 0xf1 && ch <= 0xf3)
-            {
-                if (position >= length - 4)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                if (buffer[position + 1] < 0x80 || buffer[position + 1] > 0xbf ||
-                    buffer[position + 2] < 0x80 || buffer[position + 2] > 0xbf ||
-                    buffer[position + 3] < 0x80 || buffer[position + 3] > 0xbf)
-                {
-                    bytes = 0;
-                    return false;
-                }
-
-                bytes = 4;
-                return true;
-            }
-
-            return false;
+            return -1; // is not valid UTF8
         }
         ////////////////////////////////////////////////////////////////
         //	END OF OPEN SOURCE CODE
