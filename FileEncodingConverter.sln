@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileEncodingConverter", "FileEncodingConverter\FileEncodingConverter.csproj", "{74A8363D-F89B-43AC-87B9-5880D67B1244}"
 EndProject
